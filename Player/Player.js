@@ -141,19 +141,19 @@ p.decode(<binary>);
       this.worker = worker;
       worker.addEventListener('message', function(e) {
         var data = e.data;
-        if (data.consoleLog){
-          console.log(data.consoleLog);
-          return;
-        };
+        if (data.consoleLog) return;
         
         onPictureDecoded.call(self, new Uint8Array(data.buf, 0, data.length), data.width, data.height, data.infos);
         
       }, false);
-      
+
       worker.postMessage({type: "Broadway.js - Worker init", options: {
         rgb: !webgl,
         memsize: this.memsize,
-        reuseMemory: this._config.reuseMemory ? true : false
+        reuseMemory: this._config.reuseMemory ? true : false,
+        wasmTextFile: this._config.wasmTextFile,
+        wasmBinaryFile: this._config.wasmBinaryFile,
+        asmjsCodeFile: this._config.asmjsCodeFile
       }});
       
       if (this._config.transferMemory){
