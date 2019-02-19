@@ -275,13 +275,15 @@ p.decode(<binary>);
       var height = options.height || canvasObj.canvas.height;
       
       if (canvasObj.canvas.width !== width || canvasObj.canvas.height !== height || !canvasObj.webGLCanvas){
+        canvasObj.canvas.width = width;
+        canvasObj.canvas.height = height;
         canvasObj.webGLCanvas = new WebGLCanvas({
           canvas: canvasObj.canvas,
           contextOptions: canvasObj.contextOptions,
-          width: canvasObj.canvas.width,
-          height: canvasObj.canvas.height
+          width: width,
+          height: height
         });
-      }
+      };
       
       var ylen = width * height;
       var uvlen = (width / 2) * (height / 2);
@@ -301,7 +303,12 @@ p.decode(<binary>);
 
       var width = options.width || canvasObj.canvas.width;
       var height = options.height || canvasObj.canvas.height;
-
+      
+      if (canvasObj.canvas.width !== width || canvasObj.canvas.height !== height){
+        canvasObj.canvas.width = width;
+        canvasObj.canvas.height = height;
+      };
+      
       var ctx = canvasObj.ctx;
       var imgData = canvasObj.imgData;
 
