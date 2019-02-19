@@ -274,14 +274,14 @@ p.decode(<binary>);
       var width = options.width || canvasObj.canvas.width;
       var height = options.height || canvasObj.canvas.height;
       
-      if (canvasObj.canvas.width !== width || canvasObj.canvas.height !== height || !canvasObj.webGLCanvas){
+      if (canvasObj.canvas.width !== this._config.size.width || canvasObj.canvas.height !== this._config.size.height || !canvasObj.webGLCanvas){
         canvasObj.canvas.width = width;
         canvasObj.canvas.height = height;
         canvasObj.webGLCanvas = new WebGLCanvas({
           canvas: canvasObj.canvas,
           contextOptions: canvasObj.contextOptions,
-          width: width,
-          height: height
+          width: this._config.size.width,
+          height: this._config.size.height
         });
       };
       
@@ -304,9 +304,9 @@ p.decode(<binary>);
       var width = options.width || canvasObj.canvas.width;
       var height = options.height || canvasObj.canvas.height;
       
-      if (canvasObj.canvas.width !== width || canvasObj.canvas.height !== height){
-        canvasObj.canvas.width = width;
-        canvasObj.canvas.height = height;
+      if (canvasObj.canvas.width !== this._config.size.width || canvasObj.canvas.height !== this._config.size.height){
+        canvasObj.canvas.width = this._config.size.width;
+        canvasObj.canvas.height = this._config.size.height;
       };
       
       var ctx = canvasObj.ctx;
