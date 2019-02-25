@@ -100,8 +100,8 @@ p.decode(<binary>);
     
     var lastWidth;
     var lastHeight;
-    var onPictureDecoded = function(buffer, width, height, infos) {
-      self.onPictureDecoded(buffer, width, height, infos);
+    var onPictureDecoded = function(buffer, width, height, viewWidth, viewHeight, infos) {
+      self.onPictureDecoded(buffer, width, height, viewWidth, viewHeight, infos);
       
       var startTime = nowValue();
       
@@ -113,7 +113,9 @@ p.decode(<binary>);
         canvasObj: self.canvasObj,
         data: buffer,
         width: width,
-        height: height
+        height: height,
+        viewWidth: viewWidth,
+        viewHeight: viewHeight,
       });
       
       if (self.onRenderFrameComplete){
@@ -121,6 +123,8 @@ p.decode(<binary>);
           data: buffer,
           width: width,
           height: height,
+          viewWidth: viewWidth,
+          viewHeight: viewHeight,
           infos: infos,
           canvasObj: self.canvasObj
         });
@@ -143,10 +147,10 @@ p.decode(<binary>);
         var data = e.data;
         if (data.consoleLog) return;
         
-        onPictureDecoded.call(self, new Uint8Array(data.buf, 0, data.length), data.width, data.height, data.infos);
+        onPictureDecoded.call(self, new Uint8Array(data.buf, 0, data.length), data.width, data.height, data.viewWidth, data.viewHeight, data.infos);
         
       }, false);
-
+      
       worker.postMessage({type: "Broadway.js - Worker init", options: {
         rgb: !webgl,
         memsize: this.memsize,
@@ -215,7 +219,7 @@ p.decode(<binary>);
   
   Player.prototype = {
     
-    onPictureDecoded: function(buffer, width, height, infos){},
+    onPictureDecoded: function(buffer, width, height, viewWidth, viewHeight, infos){},
     
     // call when memory of decoded frames is not used anymore
     recycleMemory: function(buf){
@@ -274,14 +278,14 @@ p.decode(<binary>);
       var width = options.width || canvasObj.canvas.width;
       var height = options.height || canvasObj.canvas.height;
       
-      if (canvasObj.canvas.width !== this._config.size.width || canvasObj.canvas.height !== this._config.size.height || !canvasObj.webGLCanvas){
-        canvasObj.canvas.width = width;
-        canvasObj.canvas.height = height;
+      if (canvasObj.canvas.width !== options.viewWidth || canvasObj.canvas.height !== options.viewHeight || !canvasObj.webGLCanvas) {
+        canvasObj.canvas.width = options.viewWidth;
+        canvasObj.canvas.height = options.viewHeight;
         canvasObj.webGLCanvas = new WebGLCanvas({
           canvas: canvasObj.canvas,
           contextOptions: canvasObj.contextOptions,
-          width: this._config.size.width,
-          height: this._config.size.height
+          width: options.viewWidth,
+          height: options.viewHeight
         });
       };
       
@@ -291,7 +295,11 @@ p.decode(<binary>);
       canvasObj.webGLCanvas.drawNextOutputPicture({
         yData: options.data.subarray(0, ylen),
         uData: options.data.subarray(ylen, ylen + uvlen),
-        vData: options.data.subarray(ylen + uvlen, ylen + uvlen + uvlen)
+        vData: options.data.subarray(ylen + uvlen, ylen + uvlen + uvlen),
+        yDataPerRow: width,
+        yRowCnt: height,
+        uDataPerRow: width/2,
+        uRowCnt: height/2
       });
       
       var self = this;
@@ -304,9 +312,9 @@ p.decode(<binary>);
       var width = options.width || canvasObj.canvas.width;
       var height = options.height || canvasObj.canvas.height;
       
-      if (canvasObj.canvas.width !== this._config.size.width || canvasObj.canvas.height !== this._config.size.height){
-        canvasObj.canvas.width = this._config.size.width;
-        canvasObj.canvas.height = this._config.size.height;
+      if (canvasObj.canvas.width !== options.viewWidth || canvasObj.canvas.height !== options.viewHeight){
+        canvasObj.canvas.width = options.viewWidth;
+        canvasObj.canvas.height = options.viewHeight;
       };
       
       var ctx = canvasObj.ctx;
